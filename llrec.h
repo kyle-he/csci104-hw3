@@ -4,6 +4,8 @@
 #define NULL 0
 #endif
 
+#include <iostream>
+
 /**
  * Node struct for both problems
  */
@@ -12,9 +14,8 @@ struct Node
     int val;
     Node *next;
 
-    Node(int v, Node* n) : val(v), next(n) {}
+    Node(int v, Node *n) : val(v), next(n) {}
 };
-
 
 /**
  * Given a linked list pointed to by head, creates two lists
@@ -70,7 +71,7 @@ void llpivot(Node *&head, Node *&smaller, Node *&larger, int pivot);
  *
  */
 template <typename Comp>
-Node* llfilter(Node* head, Comp pred);
+Node *llfilter(Node *head, Comp pred);
 
 //*****************************************************************************
 // Since template implementations should be in a header file, we will
@@ -78,13 +79,24 @@ Node* llfilter(Node* head, Comp pred);
 //*****************************************************************************
 
 template <typename Comp>
-Node* llfilter(Node* head, Comp pred)
+Node *llfilter(Node *head, Comp pred)
 {
-    //*********************************************
+    //*********************************************o
     // Provide your implementation below
     //*********************************************
-
-
+    if (head == nullptr)
+    {
+        return nullptr;
+    } else {
+        Node* nextNode = llfilter(head->next, pred);
+        if (pred(head->val)) {
+            delete head;
+            return nextNode;
+        } else {
+            head->next = nextNode;
+            return head;
+        }
+    }
 }
 
 #endif

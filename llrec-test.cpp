@@ -67,9 +67,11 @@ void dealloc(Node* head)
 //   Add any helper functions or
 //   function object struct declarations
 // -----------------------------------------------
-
-
-
+struct OddComp{
+    bool operator()(int val){
+        return val % 2 != 0;
+    }
+};
 
 
 int main(int argc, char* argv[])
@@ -79,18 +81,40 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // -----------------------------------------------
-    // Feel free to update any code below this point
-    // -----------------------------------------------
+    // test first llrec
     Node* head = readList(argv[1]);
     cout << "Original list: ";
     print(head);
 
     // Test out your linked list code
+    Node* smaller = (Node*) &head;
+    Node* larger = (Node*) &head;
+    llpivot(head, smaller, larger, 3);
 
+    cout << "AFTER OG List: ";
+    print(head);
 
+    cout << "Smaller List: ";
+    print(smaller);
 
+    cout << "Larger List: ";
+    print(larger);
+
+    dealloc(smaller);
+    dealloc(larger);
+
+    // test llfilter
+    OddComp comp;
+    Node* head2 = readList(argv[1]);
+
+    cout << "Original List: ";
+    print(head2);
+
+    cout << "Filtered List: ";
+    llfilter(head2, comp);
+    print(head2);
+
+    dealloc(head2);
     
     return 0;
-
 }

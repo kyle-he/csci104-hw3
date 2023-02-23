@@ -2,8 +2,10 @@
 #define HEAP_H
 #include <functional>
 #include <stdexcept>
+#include <vector>
+#include <iostream>
 
-template <typename T, typename PComparator = std::less<T> >
+template <typename T, typename PComparator = std::less<T>>
 class Heap
 {
 public:
@@ -15,7 +17,7 @@ public:
    *          as an argument and returns a bool if the first argument has
    *          priority over the second.
    */
-  Heap(int m=2, PComparator c = PComparator());
+  Heap(int m = 2, PComparator c = PComparator());
 
   /**
   * @brief Destroy the Heap object
@@ -28,7 +30,7 @@ public:
    * 
    * @param item item to heap
    */
-  void push(const T& item);
+  void push(const T &item);
 
   /**
    * @brief Returns the top (priority) item
@@ -36,7 +38,7 @@ public:
    * @return T const& top priority item
    * @throw std::underflow_error if the heap is empty
    */
-  T const & top() const;
+  T const &top() const;
 
   /**
    * @brief Remove the top priority item
@@ -53,63 +55,134 @@ public:
    */
   bool empty() const;
 
-    /**
+  /**
    * @brief Returns size of the heap
    * 
    */
   size_t size() const;
 
+  std::vector<T> data;
+
 private:
   /// Add whatever helper functions and data members you need below
+  PComparator comparator;
 
-
-
-
+  size_t heap_size;
+  size_t num_children;
 };
 
-// Add implementation of member functions here
+template <typename T, typename PComparator>
+Heap<T, PComparator>::Heap(int m, PComparator c)
+{
+  heap_size = 0;
+  num_children = m;
+  comparator = c;
+}
 
+template <typename T, typename PComparator>
+Heap<T, PComparator>::~Heap()
+{
+}
 
-// We will start top() for you to handle the case of 
+template <typename T, typename PComparator>
+size_t Heap<T, PComparator>::size() const
+{
+  return heap_size;
+}
+
+template <typename T, typename PComparator>
+bool Heap<T, PComparator>::empty() const
+{
+  return heap_size == 0;
+}
+
+template <typename T, typename PComparator>
+void Heap<T, PComparator>::push(const T &item)
+{
+  heap_size++;
+
+  data.push_back(item);
+  std::size_t index = data.size() - 1;
+  while (index != 0)
+  {
+    std::size_t parent_index = (index - 1) / num_children;
+    T &current = data[index];
+    T &parent = data[parent_index];
+    if (!comparator(current, parent))
+    {
+      break;
+    }
+    std::swap(current, parent);
+    index = parent_index;
+  }
+}
+
+// We will start top() for you to handle the case of
 // calling top on an empty heap
 template <typename T, typename PComparator>
-T const & Heap<T,PComparator>::top() const
+T const &Heap<T, PComparator>::top() const
 {
   // Here we use exceptions to handle the case of trying
   // to access the top element of an empty heap
-  if(empty()){
-    // ================================
-    // throw the appropriate exception
-    // ================================
-
-
+  if (empty())
+  {
+    throw std::out_of_range("heap is empty");
   }
-  // If we get here we know the heap has at least 1 item
-  // Add code to return the top element
-
-
-
+  return data[0];
 }
 
-
-// We will start pop() for you to handle the case of 
+// We will start pop() for you to handle the case of
 // calling top on an empty heap
 template <typename T, typename PComparator>
-void Heap<T,PComparator>::pop()
+void Heap<T, PComparator>::pop()
 {
-  if(empty()){
-    // ================================
-    // throw the appropriate exception
-    // ================================
-
-
+  if (empty())
+  {
+    throw std::out_of_range("heap is empty");
   }
 
+  heap_size--;
 
+  std::swap(data[0], data[data.size() - 1]);
+  data.pop_back();
 
+  std::size_t index = 0;
+  while (index < data.size())
+  {
+    std::size_t smallest_child_index = num_children * index + 1;
+
+    if (smallest_child_index >= data.size()) {
+      break;
+    }
+
+    T smallest_child = data[smallest_child_index];
+
+    for (std::size_t i = num_children * index + 1; i <= (num_children * index + 1 + num_children); i++)
+    {
+      if (i >= data.size()) {
+        break;
+      }
+
+      if (comparator(data[i], smallest_child))
+      {
+        smallest_child = data[i];
+        smallest_child_index = i;
+      }
+    }
+
+    T &current = data[index];
+    T &child = data[smallest_child_index];
+
+    if (comparator(child, current))
+    {
+      std::swap(current, child);
+      index = smallest_child_index;
+    }
+    else
+    {
+      break;
+    }
+  }
 }
 
-
-
 #endif
-
